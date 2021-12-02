@@ -1,5 +1,8 @@
+from src.bot import MCDCBot
+
 def main():
-    print("Hello world")
+    bot = MCDCBot()
+    bot.run('TOKEN')
 
 if __name__ == "__main__":
     main()
