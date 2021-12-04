@@ -1,14 +1,16 @@
 
 import discord
+import asyncio
 from src.cogs.music.ytdl_source import YTDLSource
 from src.cogs.music.song_queue import SongQueue
 
 from discord.ext import commands
 
 class Music(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot, stream):
         self.bot = bot
-        self.queue = SongQueue()
+        self.queue = SongQueue(stream)
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel = None):
@@ -21,6 +23,8 @@ class Music(commands.Cog):
         if channel is None:
             raise commands.CommandError("User not connected to a voice channel or channel not given!")
 
+        print("Joined voice channel: " + channel.name)
+
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
 
@@ -31,11 +35,14 @@ class Music(commands.Cog):
         """Leaves a voice channel"""
 
         if ctx.voice_client is not None:
+            print("Left voice channel.")
             await ctx.voice_client.disconnect()
 
     @commands.command()
     async def play(self, ctx, *, url = None):
-        """Streams from a url (same as yt, but doesn't predownload)"""
+        """Plays a song from youtube"""
+
+        await self.ensure_voice(ctx)
 
         if url is None:
             if ctx.voice_client.is_paused():
@@ -45,12 +52,12 @@ class Music(commands.Cog):
             return
 
         async with ctx.typing():
-            await self.queue.load_songs_from_youtube_url(url, self.bot.loop)
+            await self.queue.add(url, self.bot.loop)
 
-        if not ctx.voice_client.is_playing():
-            await self.play_next(ctx)
-        else:
-            await ctx.send("Added song to queue!")
+            if not ctx.voice_client.is_playing():
+                await self.play_next(ctx)
+            else:
+                await ctx.send("Added song to queue!")
 
     @commands.command()
     async def volume(self, ctx, volume: int):
@@ -66,13 +73,20 @@ class Music(commands.Cog):
     async def stop(self, ctx):
         """Stops the bot from voice"""
 
-        await ctx.voice_client.stop()
+        ctx.voice_client.stop()
 
     @commands.command()
     async def pause(self, ctx):
         """Pauses the bot from voice"""
 
         await ctx.voice_client.pause()
+        
+    @commands.command()
+    async def skip(self, ctx):
+        """Skips a song"""
+
+        ctx.voice_client.stop()
+        await self.play_next(ctx)
 
     async def ensure_voice(self, ctx):
         """Ensures that the bot is connected to a voice channel before playing music"""
@@ -85,13 +99,13 @@ class Music(commands.Cog):
 
     async def play_next(self, ctx):
         """Plays the next song in queue"""
-        if not self.queue.not_empty:
+        if not self.queue.not_empty():
+            await ctx.send('No more songs in queue!')
             return
 
-        await self.ensure_voice(ctx)
-
         async with ctx.typing():
-            song = self.queue.get()
+            song = await self.queue.get()
             source = YTDLSource(song)
-            ctx.voice_client.play(source)
-            await ctx.send('Now playing: {}'.format(song.title))
+            ctx.voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(ctx), self.bot.loop))
+
+        await ctx.send('Now playing: {}'.format(song.title))
