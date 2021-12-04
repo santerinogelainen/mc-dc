@@ -15,19 +15,19 @@ class SongQueue():
         self.downloader = YTDLDownloader()
         self.stream = stream
 
-    async def add(self, url, loop=None):
+    async def add(self, input, loop=None):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(input, download=False))
         songs = []
 
         if 'entries' in data:
             # loop playlist and take add every song
             for entry in data['entries']:
-                song = self.add_song_from_youtube_data(url, entry)
+                song = self.add_song_from_youtube_data(input, entry)
                 songs.append(song)
 
         else:
-            song = self.add_song_from_youtube_data(url, data)
+            song = self.add_song_from_youtube_data(input, data)
             songs.append(song)
             
         return songs
@@ -48,10 +48,11 @@ class SongQueue():
     def not_empty(self):
         return self.queue.qsize() > 0
 
-    def add_song_from_youtube_data(self, url, data):
+    def add_song_from_youtube_data(self, input, data):
         song = Song()
-        song.url = url
-        song.playlist_url = data['url']
+        song.input = input
+        song.url = "https://www.youtube.com/watch?v=" + data["id"]
+        song.raw_url = data['url']
         song.title = data['title']
 
         if self.stream:

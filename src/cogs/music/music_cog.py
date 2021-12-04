@@ -58,7 +58,7 @@ class Music(commands.Cog):
                 await self.play_next(ctx)
             else:
                 for song in songs:
-                    await ctx.send("Added [{}] to the queue!".format(song.title))
+                    await self.send_markdown(ctx, "Added [{}]({}) to the queue!".format(song.title, song.url))
 
     @commands.command()
     async def volume(self, ctx, volume: int):
@@ -96,15 +96,23 @@ class Music(commands.Cog):
             await ctx.send("No songs in queue!")
             return
         i = 1
+        links = []
         for song in self.queue.get_songs():
-            await ctx.send("{}. {}".format(i, song.title))
+            links.append("{}. [{}]({})".format(i, song.title, song.url))
             i += 1
+        await self.send_markdown(ctx, "\n".join(links))
 
     @commands.command("clear-queue")
     async def clear_queue(self, ctx):
         """Clears the queue"""
         self.queue.clear()
         await ctx.send("Queue cleared!")
+        
+    @commands.command()
+    async def repeat(self, ctx):
+        """Repeats the last song"""
+        if not self.queue.last_song is None:
+            await self.play(ctx, url=self.queue.last_song.url)
 
     async def ensure_voice(self, ctx):
         """Ensures that the bot is connected to a voice channel before playing music"""
@@ -126,4 +134,9 @@ class Music(commands.Cog):
             source = YTDLSource(song)
             ctx.voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(ctx), self.bot.loop))
 
-        await ctx.send('Now playing: [{}]'.format(song.title))
+        await self.send_markdown(ctx, 'Now playing: [{}]({})'.format(song.title, song.url))
+
+    async def send_markdown(self, ctx, markdown):
+        embed = discord.Embed()
+        embed.description = markdown
+        await ctx.send(embed=embed)
