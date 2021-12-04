@@ -6,7 +6,7 @@ from src.cogs.music.song_queue import SongQueue
 
 from discord.ext import commands
 
-class Music(commands.Cog):
+class MusicCog(commands.Cog):
 
     def __init__(self, bot, stream):
         self.bot = bot
@@ -152,7 +152,7 @@ class Music(commands.Cog):
     async def send_markdown(self, ctx, markdown):
         embed = discord.Embed()
 
-        # Embeds have a 6000-character limit
+        # Embeds have a 4096-character limit
         if len(markdown) > 4096:
             markdown = markdown[:4096]
 

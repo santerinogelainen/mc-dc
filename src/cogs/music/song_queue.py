@@ -63,6 +63,8 @@ class SongQueue():
             song.file_path = data['url']
             song.downloaded = True
         else:
+            # honestly you should not use this, always stream the music!
+            # this is shit and not properly tested
             self.downloader.queue_download(song)
 
         self.queue.put(song)

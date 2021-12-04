@@ -1,7 +1,7 @@
 from discord.ext import commands
 from src.settings import MCDCSettings
 
-from src.cogs.music.music_cog import Music
+from src.cogs.music.music_cog import MusicCog
 
 class MCDCBot(commands.Bot):
 
@@ -10,4 +10,4 @@ class MCDCBot(commands.Bot):
 
         print("Bot is running!")
         super().__init__(commands.when_mentioned_or("!"))
-        self.add_cog(Music(self, settings.stream_music))
+        self.add_cog(MusicCog(self, settings.stream_music))
