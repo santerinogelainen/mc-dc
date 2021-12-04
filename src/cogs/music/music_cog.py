@@ -138,5 +138,10 @@ class Music(commands.Cog):
 
     async def send_markdown(self, ctx, markdown):
         embed = discord.Embed()
+
+        # Embeds have a 6000-character limit
+        if len(markdown) > 4096:
+            markdown = markdown[:4096]
+
         embed.description = markdown
         await ctx.send(embed=embed)

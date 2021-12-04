@@ -62,6 +62,7 @@ class SongQueue():
             self.downloader.queue_download(song)
 
         self.queue.put(song)
+        print("Added {0} to the queue.".format(song.title))
         return song
 
     async def ensure_downloaded(self, song: Song):
