@@ -32,8 +32,16 @@ class SongQueue():
         await self.ensure_downloaded(self.last_song)
         return self.last_song
 
+    def clear(self):
+        with self.queue.mutex:
+            self.queue.queue.clear()
+
+    def get_songs(self):
+        with self.queue.mutex:
+            return self.queue.queue
+
     def not_empty(self):
-        return self.queue.not_empty
+        return self.queue.qsize() > 0
 
     def song_from_youtube_data(self, url, data):
         song = Song()

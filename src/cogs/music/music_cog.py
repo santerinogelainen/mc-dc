@@ -57,7 +57,7 @@ class Music(commands.Cog):
             if not ctx.voice_client.is_playing():
                 await self.play_next(ctx)
             else:
-                await ctx.send("Added song to queue!")
+                await ctx.send("Added song to the queue!")
 
     @commands.command()
     async def volume(self, ctx, volume: int):
@@ -87,6 +87,23 @@ class Music(commands.Cog):
 
         ctx.voice_client.stop()
         await self.play_next(ctx)
+
+    @commands.command("queue")
+    async def show_queue(self, ctx):
+        """Displays the current queue"""
+        if not self.queue.not_empty():
+            await ctx.send("No songs in queue!")
+            return
+        i = 1
+        for song in self.queue.get_songs():
+            await ctx.send("{}. {}".format(i, song.title))
+            i += 1
+
+    @commands.command("clear-queue")
+    async def clear_queue(self, ctx):
+        """Clears the queue"""
+        self.queue.clear()
+        await ctx.send("Queue cleared!")
 
     async def ensure_voice(self, ctx):
         """Ensures that the bot is connected to a voice channel before playing music"""
