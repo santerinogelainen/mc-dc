@@ -1,6 +1,6 @@
 import asyncio
 import queue
-import time
+import random
 
 from src.cogs.music.song import Song
 from src.cogs.music.ytdl import ytdl
@@ -44,6 +44,10 @@ class SongQueue():
     def get_songs(self):
         with self.queue.mutex:
             return self.queue.queue
+
+    def shuffle(self):
+        with self.queue.mutex:
+            random.shuffle(self.queue.queue)
 
     def not_empty(self):
         return self.queue.qsize() > 0

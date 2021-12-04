@@ -113,6 +113,13 @@ class Music(commands.Cog):
         """Repeats the last song"""
         if not self.queue.last_song is None:
             await self.play(ctx, url=self.queue.last_song.url)
+            
+    @commands.command()
+    async def shuffle(self, ctx):
+        """Shuffles the current queue"""
+        if self.queue.not_empty():
+            self.queue.shuffle()
+            await ctx.send("Queue shuffled!")
 
     async def ensure_voice(self, ctx):
         """Ensures that the bot is connected to a voice channel before playing music"""
