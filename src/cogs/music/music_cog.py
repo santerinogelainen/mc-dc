@@ -120,6 +120,12 @@ class Music(commands.Cog):
         if self.queue.not_empty():
             self.queue.shuffle()
             await ctx.send("Queue shuffled!")
+            
+    @commands.command()
+    async def song(self, ctx):
+        """Displays the current/last song in chat"""
+        if not self.queue.last_song is None:
+            await self.send_markdown(ctx, 'Current song is: [{}]({})'.format(self.queue.last_song.title, self.queue.last_song.url))
 
     async def ensure_voice(self, ctx):
         """Ensures that the bot is connected to a voice channel before playing music"""
