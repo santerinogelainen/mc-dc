@@ -48,16 +48,17 @@ class Music(commands.Cog):
             if ctx.voice_client.is_paused():
                 ctx.voice_client.resume()
                 return
-            await ctx.send("Enter the youtube url after !play")
+            await ctx.send("Enter the YouTube URL or search term after !play")
             return
 
         async with ctx.typing():
-            await self.queue.add(url, self.bot.loop)
+            songs = await self.queue.add(url, self.bot.loop)
 
             if not ctx.voice_client.is_playing():
                 await self.play_next(ctx)
             else:
-                await ctx.send("Added song to the queue!")
+                for song in songs:
+                    await ctx.send("Added [{}] to the queue!".format(song.title))
 
     @commands.command()
     async def volume(self, ctx, volume: int):
@@ -73,6 +74,7 @@ class Music(commands.Cog):
     async def stop(self, ctx):
         """Stops the bot from voice"""
 
+        await self.clear_queue(ctx)
         ctx.voice_client.stop()
 
     @commands.command()
@@ -86,7 +88,6 @@ class Music(commands.Cog):
         """Skips a song"""
 
         ctx.voice_client.stop()
-        await self.play_next(ctx)
 
     @commands.command("queue")
     async def show_queue(self, ctx):
@@ -125,4 +126,4 @@ class Music(commands.Cog):
             source = YTDLSource(song)
             ctx.voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(ctx), self.bot.loop))
 
-        await ctx.send('Now playing: {}'.format(song.title))
+        await ctx.send('Now playing: [{}]'.format(song.title))
