@@ -1,6 +1,12 @@
 # MC-DC
 MC-DC Discord music bot
 
+Starting the bot:
+
+```
+python ./main.py
+```
+
 # Command reference
 
 ## !play [url, playlist url, or a search term]
