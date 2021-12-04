@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from cogs.music import Music
+from src.cogs.music.music_cog import Music
 
 class MCDCBot(commands.Bot):
 

@@ -1,14 +1,14 @@
 
 import discord
-from cogs.music.ytdl_source import YTDLSource
-import song_queue
+from src.cogs.music.ytdl_source import YTDLSource
+from src.cogs.music.song_queue import SongQueue
 
 from discord.ext import commands
 
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.queue = song_queue.SongQueue()
+        self.queue = SongQueue()
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel = None):

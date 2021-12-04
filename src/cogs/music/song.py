@@ -1,5 +1,4 @@
-import ytdl
-
+from src.cogs.music.ytdl import ytdl
 
 class Song():
 
