@@ -1,7 +1,18 @@
 # MC-DC
 MC-DC Discord music bot
 
-Starting the bot:
+1. Install requirements:
+
+```
+pip install -r requirements.txt
+```
+
+2. Set the bot token in main.py:
+```
+bot.run('TOKEN')
+```
+
+3. Start the bot:
 
 ```
 python ./main.py
